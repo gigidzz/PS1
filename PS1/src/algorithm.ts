@@ -152,11 +152,6 @@ export function update(
  *    - card.hint is a defined string (may be empty),
  *    - card.back does not contain newline characters.
  * 
- * @spec.ensures the result is a string of the form:
- *    "Hint: <card.hint>. The answer starts with '<X>' and has <N> characters."
- *    where:
- *      - <X> === card.back.trim().charAt(0)
- *      - <N> === card.back.trim().length
  */
 export function getHint(card: Flashcard): string {
   const trimmedAnswer = card.back.trim();
@@ -171,13 +166,55 @@ export function getHint(card: Flashcard): string {
 /**
  * Computes statistics about the user's learning progress.
  *
- * @param buckets representation of learning buckets.
- * @param history representation of user's answer history.
- * @returns statistics about learning progress.
- * @spec.requires [SPEC TO BE DEFINED]
+ * @param buckets Map of bucket numbers to sets of flashcards.
+ * @param history Array of user practice records.
+ * @returns an object containing statistics:
+ *          - totalCards: total number of flashcards in all buckets
+ *          - bucketCounts: array where index `i` contains number of cards in bucket `i` (0 if missing)
+ *          - totalSessions: total number of times user has practiced any card
+ *          - correctPercentage: proportion of practice sessions rated as Easy
+ *          - averageDifficulty: average difficulty rating (0 = Wrong, 1 = Hard, 2 = Easy)
+ *
+ * @spec.requires buckets is a valid BucketMap with non-negative bucket numbers.
+ * @spec.requires history is a list of valid practice records (each with valid Flashcard, day ≥ 0, and valid AnswerDifficulty).
  */
-export function computeProgress(buckets: any, history: any): any {
-  // Replace 'any' with appropriate types
-  // TODO: Implement this function (and define the spec!)
-  throw new Error("Implement me!");
+export function computeProgress(
+  buckets: BucketMap,
+  history: Array<{
+    card: Flashcard;
+    day: number;
+    difficulty: AnswerDifficulty;
+  }>
+): {
+  totalCards: number;
+  bucketCounts: number[];
+  totalSessions: number;
+  correctPercentage: number;
+  averageDifficulty: number;
+} {
+  let totalCards = 0;
+  const bucketCounts: number[] = [];
+
+  buckets.forEach((set, bucketNum) => {
+    const count = set.size;
+    totalCards += count;
+    bucketCounts[bucketNum] = count;
+  });
+
+  const totalSessions = history.length;
+  let totalDifficulty = 0;
+  let easyCount = 0;
+
+  for (const record of history) {
+    totalDifficulty += record.difficulty;
+    if (record.difficulty === AnswerDifficulty.Easy) easyCount++;
+  }
+
+  return {
+    totalCards,
+    bucketCounts,
+    totalSessions,
+    correctPercentage: totalSessions ? easyCount / totalSessions : 0,
+    averageDifficulty: totalSessions ? totalDifficulty / totalSessions : 0,
+  };
 }

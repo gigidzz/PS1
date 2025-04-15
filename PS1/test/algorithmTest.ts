@@ -183,9 +183,21 @@ describe("getHint()", () => {
  * TODO: Describe your testing strategy for computeProgress() here.
  */
 describe("computeProgress()", () => {
-  it("Example test case - replace with your own tests", () => {
-    assert.fail(
-      "Replace this test case with your own tests based on your testing strategy"
-    );
+  it("returns 0s for empty buckets and history", () => {
+    const result = computeProgress(new Map(), []);
+    expect(result.totalCards).to.equal(0);
+    expect(result.bucketCounts).to.deep.equal([]);
+    expect(result.totalSessions).to.equal(0);
+    expect(result.correctPercentage).to.equal(0);
+    expect(result.averageDifficulty).to.equal(0);
+  });
+
+  it("handles missing buckets with sparse keys", () => {
+    const card1 = new Flashcard("Q1", "A1", "hint", []);
+    const buckets = new Map<number, Set<Flashcard>>([[3, new Set([card1])]]);
+    const result = computeProgress(buckets, []);
+
+    expect(result.totalCards).to.equal(1);
+    expect(result.bucketCounts).to.deep.equal([undefined, undefined, undefined, 1]);
   });
 });
