@@ -111,10 +111,36 @@ describe("practice()", () => {
  * TODO: Describe your testing strategy for update() here.
  */
 describe("update()", () => {
-  it("Example test case - replace with your own tests", () => {
-    assert.fail(
-      "Replace this test case with your own tests based on your testing strategy"
-    );
+  it("moves a card to bucket 0 on Wrong", () => {
+    const card = new Flashcard("Q", "A", "hint", []);
+    const buckets: BucketMap = new Map([[1, new Set([card])]]);
+    const updated = update(buckets, card, AnswerDifficulty.Wrong);
+
+    expect(updated.get(0)!.has(card)).to.be.true;
+    expect(updated.get(1)?.has(card)).to.be.false;
+  });
+  it("moves a card forward by 1 bucket on Hard", () => {
+    const card = new Flashcard("Q", "A", "hint", []);
+    const buckets: BucketMap = new Map([[1, new Set([card])]]);
+    const updated = update(buckets, card, AnswerDifficulty.Hard);
+
+    expect(updated.get(2)!.has(card)).to.be.true;
+    expect(updated.get(1)?.has(card)).to.be.false;
+  });
+  it("adds card to new bucket if it doesn't exist yet", () => {
+    const card = new Flashcard("Q", "A", "hint", []);
+    const buckets: BucketMap = new Map([[0, new Set([card])]]);
+    const updated = update(buckets, card, AnswerDifficulty.Easy);
+
+    expect(updated.has(2)).to.be.true;
+    expect(updated.get(2)!.has(card)).to.be.true;
+  });
+  it("handles card already in bucket 0 and answered Wrong", () => {
+    const card = new Flashcard("Q", "A", "hint", []);
+    const buckets: BucketMap = new Map([[0, new Set([card])]]);
+    const updated = update(buckets, card, AnswerDifficulty.Wrong);
+
+    expect(updated.get(0)!.has(card)).to.be.true;
   });
 });
 
@@ -124,10 +150,30 @@ describe("update()", () => {
  * TODO: Describe your testing strategy for getHint() here.
  */
 describe("getHint()", () => {
-  it("Example test case - replace with your own tests", () => {
-    assert.fail(
-      "Replace this test case with your own tests based on your testing strategy"
-    );
+  it("includes original hint and reveals first character and length", () => {
+    const card = new Flashcard("What is the first Greek letter?", "Alpha", "basic Greek letter", []);
+    const hint = getHint(card);
+    expect(hint).to.equal("Hint: basic Greek letter. The answer starts with 'A' and has 5 characters.");
+  });
+  it("works with single-character answers", () => {
+    const card = new Flashcard("What is the first letter?", "A", "first alphabet letter", []);
+    const hint = getHint(card);
+    expect(hint).to.equal("Hint: first alphabet letter. The answer starts with 'A' and has 1 characters.");
+  });
+  it("handles multi-word answers", () => {
+    const card = new Flashcard("What city never sleeps?", "New York", "city that never sleeps", []);
+    const hint = getHint(card);
+    expect(hint).to.equal("Hint: city that never sleeps. The answer starts with 'N' and has 8 characters.");
+  });
+  it("works when the original hint is empty", () => {
+    const card = new Flashcard("Q", "Answer", "", []);
+    const hint = getHint(card);
+    expect(hint).to.equal("Hint: . The answer starts with 'A' and has 6 characters.");
+  });
+  it("ignores whitespace around the back text", () => {
+    const card = new Flashcard("Q", "   Zebra  ", "animal", []);
+    const hint = getHint(card);
+    expect(hint).to.equal("Hint: animal. The answer starts with 'Z' and has 5 characters.");
   });
 });
 

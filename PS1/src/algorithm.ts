@@ -102,21 +102,71 @@ export function update(
   card: Flashcard,
   difficulty: AnswerDifficulty
 ): BucketMap {
-  // TODO: Implement this function
-  throw new Error("Implement me!");
+  const newBuckets: BucketMap = new Map();
+
+  
+  for (const [bucketNum, cardSet] of buckets.entries()) {
+    newBuckets.set(bucketNum, new Set(cardSet));
+  }
+
+  let currentBucket = -1;
+
+  
+  for (const [bucketNum, cardSet] of newBuckets.entries()) {
+    if (cardSet.has(card)) {
+      currentBucket = bucketNum;
+      cardSet.delete(card); 
+      break;
+    }
+  }
+
+  let newBucket: number;
+  if (difficulty === AnswerDifficulty.Wrong) {
+    newBucket = 0;
+  } else if (difficulty === AnswerDifficulty.Hard) {
+    newBucket = currentBucket + 1;
+  } else {
+    newBucket = currentBucket + 2;
+  }
+
+  if (!newBuckets.has(newBucket)) {
+    newBuckets.set(newBucket, new Set());
+  }
+
+  newBuckets.get(newBucket)!.add(card);
+
+  return newBuckets;
 }
 
 /**
  * Generates a hint for a flashcard.
  *
  * @param card flashcard to hint
- * @returns a hint for the front of the flashcard.
- * @spec.requires card is a valid Flashcard.
+ * @returns a hint string that includes:
+ *    - the original `card.hint` exactly as-is,
+ *    - the first non-space character of `card.back`,
+ *    - and the total number of characters in `card.back` after trimming.
+ *
+ * @spec.requires card is a valid Flashcard such that:
+ *    - card.back.trim().length > 0 (non-empty after trimming),
+ *    - card.hint is a defined string (may be empty),
+ *    - card.back does not contain newline characters.
+ * 
+ * @spec.ensures the result is a string of the form:
+ *    "Hint: <card.hint>. The answer starts with '<X>' and has <N> characters."
+ *    where:
+ *      - <X> === card.back.trim().charAt(0)
+ *      - <N> === card.back.trim().length
  */
 export function getHint(card: Flashcard): string {
-  // TODO: Implement this function (and strengthen the spec!)
-  throw new Error("Implement me!");
+  const trimmedAnswer = card.back.trim();
+  const firstChar = trimmedAnswer.charAt(0);
+  const length = trimmedAnswer.length;
+
+  return `Hint: ${card.hint}. The answer starts with '${firstChar}' and has ${length} characters.`;
 }
+
+
 
 /**
  * Computes statistics about the user's learning progress.
