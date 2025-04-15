@@ -57,8 +57,7 @@ export function getBucketRange(
   });
 
   return isFinite(min) ? {minBucket: min, maxBucket: max} : undefined;
-}
-
+  }
 
 
 /**
@@ -75,7 +74,18 @@ export function practice(
   day: number
 ): Set<Flashcard> {
   // TODO: Implement this function
-  throw new Error("Implement me!");
+  const toPractice = new Set<Flashcard>();
+
+  for (let i = 0; i < buckets.length; i++) {
+    if (day % Math.pow(2, i) === 0) {
+      for (const card of buckets[i]!) {
+        toPractice.add(card);
+      }
+    }
+  }
+
+  return toPractice;
+  
 }
 
 /**

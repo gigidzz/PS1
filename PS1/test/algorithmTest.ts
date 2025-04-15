@@ -71,10 +71,37 @@ describe("getBucketRange()", () => {
  * TODO: Describe your testing strategy for practice() here.
  */
 describe("practice()", () => {
-  it("Example test case - replace with your own tests", () => {
-    assert.fail(
-      "Replace this test case with your own tests based on your testing strategy"
-    );
+  it("returns an empty set for empty buckets", () => {
+    expect(practice([], 0).size).to.equal(0);
+  });
+  it("returns only bucket 0 cards on odd days", () => {
+    const c0 = new Flashcard("Q0", "A0", "hint", []);
+    const c1 = new Flashcard("Q1", "A1", "hint", []);
+    const buckets = [
+      new Set([c0]),
+      new Set([c1]),
+    ];
+
+    const result = practice(buckets, 1);
+    expect(result.has(c0)).to.be.true;
+    expect(result.has(c1)).to.be.false;
+    expect(result.size).to.equal(1);
+  });
+  it("includes cards from all buckets on day 0", () => {
+    const c0 = new Flashcard("Q0", "A0", "hint", []);
+    const c1 = new Flashcard("Q1", "A1", "hint", []);
+    const c2 = new Flashcard("Q2", "A2", "hint", []);
+    const buckets = [
+      new Set([c0]),
+      new Set([c1]),
+      new Set([c2])
+    ];
+
+    const result = practice(buckets, 0);
+    expect(result.has(c0)).to.be.true;
+    expect(result.has(c1)).to.be.true;
+    expect(result.has(c2)).to.be.true;
+    expect(result.size).to.equal(3);
   });
 });
 
