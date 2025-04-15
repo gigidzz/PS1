@@ -20,7 +20,19 @@ import { Flashcard, AnswerDifficulty, BucketMap } from "./flashcards";
  */
 export function toBucketSets(buckets: BucketMap): Array<Set<Flashcard>> {
   // TODO: Implement this function
-  throw new Error("Implement me!");
+
+  if (buckets.size === 0) return [];
+  const maxBucket = Math.max(...buckets.keys(), 0);
+
+  const result: Array<Set<Flashcard>> = [];
+  for (let i = 0; i <= maxBucket; i++){
+    result.push(new Set());
+  }
+
+  buckets.forEach((cards,bucketNum)=>{
+    result[bucketNum] = new Set(cards);
+  });
+  return result;
 }
 
 /**

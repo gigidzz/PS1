@@ -8,6 +8,7 @@ import {
   getHint,
   computeProgress,
 } from "../src/algorithm";
+import { expect } from "chai";
 
 /*
  * Testing strategy for toBucketSets():
@@ -15,10 +16,17 @@ import {
  * TODO: Describe your testing strategy for toBucketSets() here.
  */
 describe("toBucketSets()", () => {
-  it("Example test case - replace with your own tests", () => {
-    assert.fail(
-      "Replace this test case with your own tests based on your testing strategy"
-    );
+  it("returns an empty array for an empty BucketMap", () => {
+    const map: BucketMap = new Map();
+    const result = toBucketSets(map);
+    expect(result).to.deep.equal([]);
+  });
+  it("returns correct array with one bucket", () => {
+    const card = new Flashcard("Q", "A", "hint", []);
+    const map: BucketMap = new Map([[0, new Set([card])]]);
+    const result = toBucketSets(map);
+    expect(result.length).to.equal(1);
+    expect(result[0]!.has(card)).to.be.true;
   });
 });
 
