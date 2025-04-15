@@ -46,9 +46,20 @@ export function toBucketSets(buckets: BucketMap): Array<Set<Flashcard>> {
 export function getBucketRange(
   buckets: Array<Set<Flashcard>>
 ): { minBucket: number; maxBucket: number } | undefined {
-  // TODO: Implement this function
-  throw new Error("Implement me!");
+  let min = Infinity;
+  let max = -Infinity;
+
+  buckets.forEach((set, index) => {
+    if (set.size > 0) {
+      min = Math.min(min, index);
+      max = Math.max(max, index);
+    }
+  });
+
+  return isFinite(min) ? {minBucket: min, maxBucket: max} : undefined;
 }
+
+
 
 /**
  * Selects cards to practice on a particular day.

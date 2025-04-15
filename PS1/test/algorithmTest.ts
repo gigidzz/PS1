@@ -28,6 +28,7 @@ describe("toBucketSets()", () => {
     expect(result.length).to.equal(1);
     expect(result[0]!.has(card)).to.be.true;
   });
+
 });
 
 /*
@@ -36,12 +37,33 @@ describe("toBucketSets()", () => {
  * TODO: Describe your testing strategy for getBucketRange() here.
  */
 describe("getBucketRange()", () => {
-  it("Example test case - replace with your own tests", () => {
-    assert.fail(
-      "Replace this test case with your own tests based on your testing strategy"
-    );
+  it("returns undefined when all buckets are empty", () => {
+    const result = getBucketRange([]);
+    expect(result).to.be.undefined;
+  });
+  it("returns correct range when only one bucket has cards", () => {
+    const card = new Flashcard("Q", "A", "hint", []);
+    const result = getBucketRange([new Set(), new Set([card]), new Set()]);
+    expect(result).to.deep.equal({ minBucket: 1, maxBucket: 1 });
+  });
+  it("returns correct range with non-consecutive filled buckets", () => {
+    const card1 = new Flashcard("Q1", "A1", "hint", []);
+    const card2 = new Flashcard("Q2", "A2", "hint", []);
+    const card3 = new Flashcard("Q3", "A3", "hint", []);
+    const buckets: Array<Set<Flashcard>> = [
+      new Set([card1]),        // 0
+      new Set(),               // 1
+      new Set([card2]),        // 2
+      new Set(),               // 3
+      new Set([card3]),        // 4
+    ];
+    const result = getBucketRange(buckets);
+    expect(result).to.deep.equal({ minBucket: 0, maxBucket: 4 });
   });
 });
+
+
+
 
 /*
  * Testing strategy for practice():
